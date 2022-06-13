@@ -1,0 +1,25 @@
+FROM --platform=linux/amd64 ubuntu:22.04 as builder
+
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-is-python3 zlib1g-dev clang make pkg-config curl
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libboost-dev libfreetype-dev libharfbuzz-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libboost-all-dev
+
+COPY . /repo
+WORKDIR /repo
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git
+RUN ./bootstrap.sh
+RUN ./configure CUSTOM_CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
+RUN make -j8
+ENV LD_LIBRARY_PATH=/repo/src
+
+RUN mkdir -p /deps
+RUN ldd /repo/utils/svg2png/svg2png | tr -s '[:blank:]' '\n' | grep '^/' | xargs -I % sh -c 'cp % /deps;'
+
+FROM ubuntu:22.04 as package
+
+COPY --from=builder /deps /deps
+COPY --from=builder /repo/utils/svg2png/svg2png /repo/utils/svg2png/svg2png
+ENV LD_LIBRARY_PATH=/deps
+
