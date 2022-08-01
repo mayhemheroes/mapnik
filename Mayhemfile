@@ -1,7 +1,6 @@
 project: mapnik
 target: svg2png
 cmds:
-  - cmd: /repo/utils/svg2png/svg2png /test.svg
-    filepath: /test.svg
+  - cmd: /svg2png @@
     env:
       DISABLE_SMOKETEST: '1'
