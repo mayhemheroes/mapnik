@@ -11,8 +11,10 @@ RUN sed -i 's/PGSQL2SQLITE = True/PGSQL2SQLITE = False/g' bootstrap.sh
 RUN ./bootstrap.sh
 RUN ./configure CUSTOM_CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
 RUN make -j8
+RUN clang++ /repo/mayhem/fuzz_rtrim.cpp -fsanitize=fuzzer,address -I /repo/include/mapnik/util/ -o /fuzz
 
 FROM ubuntu:22.04 as package
 COPY --from=builder /repo/utils/svg2png/svg2png /
 COPY --from=builder /repo/src/*.so* /deps/
+COPY --from=builder /fuzz /fuzz_rtrim
 ENV LD_LIBRARY_PATH=/deps
