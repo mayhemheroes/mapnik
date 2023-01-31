@@ -3,3 +3,5 @@ target: svg2png
 cmds:
   - cmd: /svg2png @@
     filepath: /test.svg
+    env:
+      AFL_NO_FORKSRV: "1"
