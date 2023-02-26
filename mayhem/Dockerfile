@@ -5,6 +5,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential python-is-
 
 COPY . /repo
 WORKDIR /repo
+# RUN sed -i 's/BENCHMARK = True/BENCHMARK = False/g' bootstrap.sh
+RUN sed -i 's/CPP_TESTS = True/CPP_TESTS = False/g' bootstrap.sh
+# RUN sed -i 's/PGSQL2SQLITE = True/PGSQL2SQLITE = False/g' bootstrap.sh
 RUN ./bootstrap.sh
 RUN ./configure CUSTOM_CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
 RUN make -j8
